@@ -7,7 +7,7 @@ Config.amount =
 
 Config.count =
 {
-	count = 3, -- How many events will show before end
+	count = 7, -- How many events will show before end
 }
 
 Config.time = 
