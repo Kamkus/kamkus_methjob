@@ -1,0 +1,82 @@
+  
+body {
+    background: none !important;
+}
+
+#container {
+    font-size: 20px;
+    padding: 25px;
+    color: rgb(80, 58, 204);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url("img.jpg");
+    background-size:cover;
+    height: 400px;
+    width: 300px;
+    padding: 10px;
+    border: 2px solid rgb(81, 169, 247);
+    border-radius: 40px;
+    display: flex;
+}
+
+.notifyjs-bootstrap-success
+{
+  background-image: none !important;
+}
+.notifyjs-bootstrap-warn
+{
+  background-image: none !important;
+}
+.notifyjs-bootstrap-error
+{
+  background-image: none !important;
+}
+.notifyjs-bootstrap-info
+{
+  background-image: none !important;
+}
+.notifyjs-bootstrap-base{
+  font-size: 20px;
+  padding: 15px 10px 15px 10px  !important;
+  max-width:300px; 
+  word-wrap:break-word;
+  white-space: normal !important;
+  overflow-wrap: normal;
+  font-weight:bold;
+}
+
+.notifyjs-corner{
+  margin-left: 40px !important;
+  margin-top: 40px  !important;
+}
+#form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+button {
+  width: 250px;
+  border: 3px solid #010200;
+  padding: 12px 28px;
+  display: block;
+  background-color: #78a5e9;
+  transition-duration: 0.4s;
+  border-radius: 12px;
+  overflow : hidden;
+  outline: 0;
+  margin: auto;
+}
+button:hover {
+    background-color: #4182e4;
+    color: white;
+  }
+button:active
+{
+    background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
