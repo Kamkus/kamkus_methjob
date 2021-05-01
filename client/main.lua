@@ -1,14 +1,16 @@
-  
+
 ESX              = nil
 local PlayerData = {}
 local display = false
 local display1 = false
 local setting = false
+talking = false
 cooking = false
 local setted = false
 good = false
 Answering = false
 check = false
+selling = false
 Citizen.CreateThread(function()
 	while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -24,6 +26,90 @@ RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
   PlayerData.job = job
 end)
+
+Citizen.CreateThread(function()
+    RequestModel( GetHashKey( "a_m_y_business_02" ) )
+	while not HasModelLoaded("a_m_y_business_02") do
+		Wait(1)
+	end
+    local ped = CreatePed(4, GetHashKey( "a_m_y_business_02" ), Config.DealerPosition[1].x, Config.DealerPosition[1].y, Config.DealerPosition[1].z, 0, false, true)
+    FreezeEntityPosition(ped, true)
+	SetEntityInvincible(ped, true)
+	SetBlockingOfNonTemporaryEvents(ped, true)
+	TaskStartScenarioInPlace(ped, "WORLD_HUMAN_COP_IDLES", 0, true)
+	local pos1 = GetEntityCoords(ped)
+	while not talking do
+		Wait(3)
+		local pos2 = GetEntityCoords(GetPlayerPed(-1))
+		local distance = GetDistanceBetweenCoords(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, true)
+		if distance < 5 then
+		ESX.Game.Utils.DrawText3D(GetEntityCoords(ped), "[E] Talk with this guy", 0.4)
+		if (IsControlJustPressed(0,38)) then
+			Notify("What do you want?!", "info")
+			talking = true
+		end
+	end
+
+	while talking do
+		Wait(3)
+		local pos1 = GetEntityCoords(ped)
+		local pos2 = GetEntityCoords(GetPlayerPed(-1))
+		local distance = GetDistanceBetweenCoords(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, true)
+		if distance < 5 then
+		ESX.Game.Utils.DrawText3D(GetEntityCoords(ped), "[E] Sell Drugs [N] Fuck you Dog!", 0.4)
+		if IsControlJustPressed(0,306) then
+			Notify("You pissed me off! Get the fuck out of I will kill you!", "info")
+			talking = false
+			print(talking)
+			break
+		else if IsControlJustPressed(0,38) and not selling then
+			local destination = Config.DeliveryPoints[GetRandomIntInRange(1, #Config.DeliveryPoints)]
+			selling = true
+			talking = false
+			Selling(destination)
+			break
+		else if IsControlJustPressed(0,38) and selling then
+			Notify("I just gave you destination! Go and Sell it!")
+			talking = false
+			break
+				end
+			end
+		end
+	end
+end
+end
+end)
+
+function Selling(destination)
+		Notify("Get you ass in the vehicle, and go there!", "success")
+			SetNewWaypoint(destination.x, destination.y)
+			RequestModel("Burrito3")
+			while not HasModelLoaded("Burrito3") do
+				Wait(1)
+			end
+			local vehicle = CreateVehicle("Burrito3", Config.CarSpawnPosition[1].x,  Config.CarSpawnPosition[1].y , Config.CarSpawnPosition[1].z , 1,  true, false)
+			SetVehicleOnGroundProperly(vehicle)
+			SetVehicleDoorsLocked(vehicle , 1)
+			
+			while selling do
+				Wait(1)
+				local pos = GetEntityCoords(GetPlayerPed(-1))
+				local distance = GetDistanceBetweenCoords(pos.x, pos.y, pos.z, destination.x, destination.y, destination.z, true)
+				if distance < 30 and IsPedInVehicle(GetPlayerPed(-1), vehicle, true) then
+					ESX.Game.Utils.DrawText3D(destination, "[E]Deliver Drugs!", 2.0)
+					if(IsControlJustPressed(0,38)) then
+						selling = false
+						Notify("Selling, please wait!", "info")
+						Wait(10000)
+						TriggerServerEvent("Sell")
+						DeleteVehicle(vehicle)
+					end
+				end
+			end
+			
+end
+
+
 
 
 local options = {
@@ -85,7 +171,7 @@ AddEventHandler("methjob_start", function(PackageObject)
 	cooking = true
   	StartCooking(PackageObject)
   else
-  	ESX.ShowNotification("~r~You're already cooking man!")
+  	Notify(" You're already cooking man!","error" )
   end
 end)
 
