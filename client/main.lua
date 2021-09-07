@@ -11,6 +11,7 @@ good = false
 Answering = false
 check = false
 selling = false
+onGround = false
 Citizen.CreateThread(function()
 	while ESX == nil do
 		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
@@ -22,10 +23,25 @@ AddEventHandler('esx:playerLoaded', function(xPlayer)
   PlayerData = xPlayer   
 end)
 
+
+function loadAnimDict( dict )
+    while ( not HasAnimDictLoaded( dict ) ) do
+        RequestAnimDict( dict )
+        Citizen.Wait( 5 )
+    end
+end 
+
+
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
   PlayerData.job = job
 end)
+
+RegisterCommand('random', function(source, args)
+    print(Config.SpawnPosition[GetRandomIntInRange(1, #Config.SpawnPosition)])
+  
+end, false)
+
 
 Citizen.CreateThread(function()
     RequestModel( GetHashKey( "a_m_y_business_02" ) )
@@ -158,6 +174,8 @@ function Notify(message, option) -- There are 4 options : success, info, warn, e
     })
 	end
 
+exports("Notify", Notify)
+
 RegisterNetEvent("methjob_notify")
 AddEventHandler("methjob_notify", function(message, option)
 	Notify(message, option)
@@ -177,6 +195,8 @@ end)
 
 RegisterNetEvent("methjob_place")
 AddEventHandler("methjob_place", function(source)
+	loadAnimDict('amb@medic@standing@kneel@base')
+	  loadAnimDict('anim@gangops@facility@servers@bodysearch@')
 	if not cooking then
 	local ped = GetPlayerPed(-1)
   		local pos = GetEntityCoords(ped)
@@ -195,10 +215,17 @@ AddEventHandler("methjob_place", function(source)
 		Citizen.Wait(0)
 	ESX.Game.Utils.DrawText3D(GetEntityCoords(GetPlayerPed(-1)), "[E] Place table, [N] Put in Backpack", 0.4)
 	if(IsControlJustPressed(0,38)) then
+		onGround = true
 	DetachEntity(PackageObject, 1, 1)
 	PlaceObjectOnGroundProperly(PackageObject)
 	FreezeEntityPosition(PackageObject, true)
+	TaskPlayAnim(GetPlayerPed(-1), "amb@medic@standing@kneel@base" ,"base" ,8.0, -8.0, -1, 1, 0, false, false, false )
+		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false)
+	Notify("Setting table ...", "info")
+	Wait(6000)		
 	setting = false
+	Notify("Table setted successfuly!", "success")
+	ClearPedTasksImmediately(GetPlayerPed(-1))
 	setted = true
 	break
 		elseif IsControlJustPressed(0,306) then
@@ -215,11 +242,23 @@ local pos2 = GetEntityCoords(PackageObject)
 		pos = GetEntityCoords(ped)
 		local distance = GetDistanceBetweenCoords(pos.x, pos.y, pos.z, pos2.x, pos2.y, pos2.z, true)
 			if(distance<5) then
-		ESX.Game.Utils.DrawText3D(GetEntityCoords(PackageObject), "Press [E] to cook", 0.7)
+		ESX.Game.Utils.DrawText3D(GetEntityCoords(PackageObject), "Press [E] to cook, Press [N] to hide table", 0.7)
 		if(IsControlJustPressed(0,38)) then
 				setted = false
 				TriggerEvent("methjob_start", PackageObject)
 				break
+		elseif IsControlJustPressed(0,306) then
+			TaskPlayAnim(GetPlayerPed(-1), "amb@medic@standing@kneel@base" ,"base" ,8.0, -8.0, -1, 1, 0, false, false, false )
+		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false)
+		Notify("Hiding table ...", "info")
+		Wait(6000)
+		Notify("Table hided sucessfuly!", "success")
+		ClearPedTasksImmediately(GetPlayerPed(-1))
+			DetachEntity(PackageObject, 1, 1)
+			DeleteObject(PackageObject)
+			setted = false
+			TriggerServerEvent("AddTable")
+			break
 			end
 		end
 	end
@@ -270,7 +309,6 @@ function StartCooking(PackageObject)
 	end
 end
 
-
 function Smoke(obj)
 	pos = GetEntityCoords(obj)
 		SetPtfxAssetNextCall("core")
@@ -282,6 +320,8 @@ function Smoke(obj)
 	end
 
 RegisterNUICallback("success", function(data)
+	loadAnimDict('amb@medic@standing@kneel@base')
+		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false )
     Answering = false
     SetDisplay(false,"null")
     Notify("Great job! Looks like it worked", "success")
@@ -289,6 +329,8 @@ RegisterNUICallback("success", function(data)
 end)
 
 RegisterNUICallback("error", function(data)
+	loadAnimDict('amb@medic@standing@kneel@base')
+		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false )
 	Answering = false
     SetDisplay(false, "null")
     Notify("Ups! Seems like It didn't work", "error")
@@ -337,4 +379,5 @@ Citizen.CreateThread(function()
         DisableControlAction(0, 322, display) -- ESC
         DisableControlAction(0, 106, display) -- VehicleMouseControlOverride
     end
+    
 end)
