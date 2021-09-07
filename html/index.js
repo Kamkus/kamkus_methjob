@@ -14,7 +14,7 @@
             $("#progressbar").hide();
         }
     }
-
+    $("#progressbar1").hide();
     display1(false)
     display(false)
 
@@ -41,6 +41,39 @@
                 setTimeout(function(){ $("#progressbar").fadeOut(); }, 3000)
             } else {
                 display1(false)
+            }
+        }
+
+
+        if (item.type === "progress") {
+            if (item.display === true) {
+            $("#progressbar1").show();
+                var start = new Date();
+                var timeoutVal = Math.floor(item.time/100);
+                var maxTime = item.time;
+                $('#bar_text1').text(item.text);
+                animateUpdate();
+
+
+                function updateProgress(percentage) {
+                    $('#bar_div1').css("width", percentage + "%");
+                }
+
+                function animateUpdate() {
+                    var now = new Date();
+                    var timeDiff = now.getTime() - start.getTime();
+                    var perc = Math.round((timeDiff/maxTime)*100);
+                    console.log(perc);
+                    if (perc <= 100) {
+                        updateProgress(perc);
+                        setTimeout(animateUpdate, timeoutVal);
+                    } else {
+                        $("#progressbar1").hide();
+                    }
+                }
+ 
+            } else {
+                $("#progressbar1").hide();
             }
         }
 
