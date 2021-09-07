@@ -115,7 +115,7 @@ function Selling(destination)
 					ESX.Game.Utils.DrawText3D(destination, "[E]Deliver Drugs!", 2.0)
 					if(IsControlJustPressed(0,38)) then
 						selling = false
-						Notify("Selling, please wait!", "info")
+						Progress(10000, "Selling drugs ...")
 						Wait(10000)
 						TriggerServerEvent("Sell")
 						DeleteVehicle(vehicle)
@@ -221,7 +221,7 @@ AddEventHandler("methjob_place", function(source)
 	FreezeEntityPosition(PackageObject, true)
 	TaskPlayAnim(GetPlayerPed(-1), "amb@medic@standing@kneel@base" ,"base" ,8.0, -8.0, -1, 1, 0, false, false, false )
 		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false)
-	Notify("Setting table ...", "info")
+	Progress(6000, " Setting table ...")
 	Wait(6000)		
 	setting = false
 	Notify("Table setted successfuly!", "success")
@@ -250,7 +250,7 @@ local pos2 = GetEntityCoords(PackageObject)
 		elseif IsControlJustPressed(0,306) then
 			TaskPlayAnim(GetPlayerPed(-1), "amb@medic@standing@kneel@base" ,"base" ,8.0, -8.0, -1, 1, 0, false, false, false )
 		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false)
-		Notify("Hiding table ...", "info")
+		Progress(6000, " Hiding table ...")
 		Wait(6000)
 		Notify("Table hided sucessfuly!", "success")
 		ClearPedTasksImmediately(GetPlayerPed(-1))
@@ -322,8 +322,10 @@ function Smoke(obj)
 RegisterNUICallback("success", function(data)
 	loadAnimDict('amb@medic@standing@kneel@base')
 		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false )
+		Progress(5000, "Adding substance ...")
     Answering = false
     SetDisplay(false,"null")
+        Wait(5000)
     Notify("Great job! Looks like it worked", "success")
     Smoke(data.object)
 end)
@@ -331,8 +333,10 @@ end)
 RegisterNUICallback("error", function(data)
 	loadAnimDict('amb@medic@standing@kneel@base')
 		TaskPlayAnim(GetPlayerPed(-1), "anim@gangops@facility@servers@bodysearch@" ,"player_search" ,8.0, -8.0, -1, 48, 0, false, false, false )
+		Progress(5000, "Adding substance ...")
 	Answering = false
     SetDisplay(false, "null")
+    	Wait(5000)
     Notify("Ups! Seems like It didn't work", "error")
     Explode(data.object)
 end)
@@ -365,6 +369,15 @@ function ProgressBar(bool1, percentage, text)
         percentage = percentage,
         word = "+ " .. text .. "xp",
     })
+end
+
+function Progress(time, text) 
+	SendNUIMessage({
+		type = "progress",
+		display = true,
+		time = time,
+		text = text
+	})
 end
 
 
